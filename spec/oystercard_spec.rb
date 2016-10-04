@@ -2,7 +2,7 @@ require 'oystercard'
 
 describe Oystercard do
 
-  let(:entry_station) {double :entry_station}
+  let(:station) {double :station}
 
   it { is_expected.to respond_to :balance }
 
@@ -26,43 +26,30 @@ describe Oystercard do
     end
   end
 
-  describe '#in_journey' do
-    it 'return in use if touched in' do
-      expect(subject.touch_in(entry_station)).to be_in_journey
-    end
+  describe '#touch_in' do
 
     it 'raises an error at touch in if insufficent balance' do
-      expect{subject.touch_in(entry_station)}.to raise_error "Insufficent balance"
-    end
-
-    it 'returns true with touch_in' do
-      subject.top_up(10)
-      subject.touch_in(entry_station)
-      expect(subject.in_journey).to be true
+      expect{subject.touch_in(station)}.to raise_error "Insufficent balance"
     end
 
     it 'remembers entry station after touch in' do
       subject.top_up(10)
-      subject.touch_in(entry_station)
-      expect(subject.entry_station).to eq entry_station
+      subject.touch_in(station)
+      expect(subject.entry_station).to eq station
     end
+  end
 
-    it 'returns false with touch_out' do
-      subject.top_up(10)
-      subject.touch_in(entry_station)
-      subject.touch_out
-      expect(subject.in_journey).to be false
-    end
+  describe '#touch_out' do
 
     it 'when journey is complete deducts fare from balance' do
       subject.top_up(10)
-      subject.touch_in(entry_station)
+      subject.touch_in(station)
       expect{subject.touch_out}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
     end
 
     it 'sets entry station to nil with touch out' do
       subject.top_up(10)
-      subject.touch_in(entry_station)
+      subject.touch_in(station)
       subject.touch_out
       expect(subject.touch_out).to eq nil
     end

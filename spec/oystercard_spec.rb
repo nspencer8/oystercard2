@@ -30,22 +30,24 @@ describe Oystercard do
 
     it 'is able to deduct fare from balance' do
       subject.top_up(50)
-      expect{subject.deduct 10}.to change{ subject.balance }.by -10
+      expect(subject.deduct(10)).to eq 40
     end
   end
 
-  describe '#in_journey?' do
+  describe '#in_journey' do
+    it 'return in use if touched in' do
+      expect(subject).not_to be_in_journey
+    end
+
     it 'returns true with touch_in' do
-      expect(subject.touch_in).to eq true
+      subject.touch_in
+      expect(subject.in_journey).to be true
     end
 
     it 'returns false with touch_out' do
-      expect(subject.touch_out).to eq true
-    end
-
-    it 'Confirms in journey when touch in is true' do
       subject.touch_in
-      expect(subject.in_journey).to eq true
+      subject.touch_out
+      expect(subject.in_journey).to be false
     end
   end
 end

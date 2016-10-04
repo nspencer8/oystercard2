@@ -9,7 +9,7 @@ MINIMUM_FARE = 1
   def initialize
     @balance = 0
     @limit = MINIMUM_BALANCE
-    @in_journey = false
+    #@in_journey = false
   end
 
   def top_up(amount)
@@ -17,9 +17,9 @@ MINIMUM_FARE = 1
     @balance += amount
   end
 
-  def in_journey?
-      false
-  end
+  # def in_journey?
+  #     false
+  # end
 
   def touch_in(entry_station)
     fail "Insufficent balance" if balance < MINIMUM_BALANCE

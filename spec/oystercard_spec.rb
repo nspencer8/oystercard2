@@ -1,6 +1,8 @@
 require 'oystercard'
 
 describe Oystercard do
+  subject(:oystercard) {described_class.new}
+  let(:deduct) {double :deduct}
 
   it { is_expected.to respond_to :balance }
 
@@ -24,15 +26,6 @@ describe Oystercard do
     end
   end
 
-  describe '#deduct' do
-
-    it { is_expected.to respond_to(:deduct).with(1).argument }
-
-    it 'is able to deduct fare from balance' do
-      subject.top_up(50)
-      expect(subject.deduct(10)).to eq 40
-    end
-  end
 
   describe '#in_journey' do
     it 'return in use if touched in' do
@@ -54,6 +47,12 @@ describe Oystercard do
       subject.touch_in
       subject.touch_out
       expect(subject.in_journey).to be false
+    end
+
+    it 'when journey is complete deducts fare from balance' do
+      subject.top_up(10)
+      subject.touch_in
+      expect{subject.touch_out}.to change{subject.balance}.from(10).to(9)
     end
   end
 end

@@ -39,12 +39,18 @@ describe Oystercard do
       expect(subject).not_to be_in_journey
     end
 
+    it 'raises an error at touch in if insufficent balance' do
+      expect{subject.touch_in}.to raise_error "Insufficent balance"
+    end
+
     it 'returns true with touch_in' do
+      subject.top_up(10)
       subject.touch_in
       expect(subject.in_journey).to be true
     end
 
     it 'returns false with touch_out' do
+      subject.top_up(10)
       subject.touch_in
       subject.touch_out
       expect(subject.in_journey).to be false

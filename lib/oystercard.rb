@@ -9,8 +9,6 @@ MINIMUM_FARE = 1
   def initialize
     @balance = 0
     @limit = MINIMUM_BALANCE
-    @in_journey = false
-    #@journeys = []
   end
 
   def in_journey?
@@ -25,7 +23,6 @@ MINIMUM_FARE = 1
   def touch_in(entry_station)
     fail "Insufficent balance" if balance < MINIMUM_BALANCE
     @entry_station = entry_station
-    @in_journey = true
   end
 
   def touch_out(exit_station)

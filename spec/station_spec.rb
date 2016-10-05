@@ -1,6 +1,10 @@
+#understands the station
 require 'station'
 
 describe Station do
+  
+  let(:entry_station) {double :entry_station == "Aldgate"}
+  let(:exit_station) {double (:exit_station == "Bank")}
 
   subject(:station) {Station.new("Bank", 1)}
 

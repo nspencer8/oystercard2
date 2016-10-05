@@ -1,13 +1,11 @@
 require 'oystercard'
+require 'journey'
 
 describe Oystercard do
 
   let(:entry_station) {double :entry_station == "Aldgate"}
   let(:exit_station) {double (:exit_station == "Bank")}
 
-  it "has an empty list of journeys by default" do
-    expect(subject.journey_log).to be_empty
-  end
 
   it { is_expected.to respond_to :balance }
 
@@ -33,48 +31,24 @@ describe Oystercard do
 
   describe '#touch_in' do
 
-    it 'raises an error at touch in if insufficent balance' do
-      expect{subject.touch_in(entry_station)}.to raise_error "Insufficent balance"
+    it 'starts a journey' do
+      subject.top_up(10)
+      subject.touch_in
+      expect(subject.journey).to eq entry_station
     end
 
-    it 'remembers entry station after touch in' do
-      subject.top_up(10)
-      subject.touch_in(entry_station)
-      expect(subject.entry_station).to eq entry_station
+    it 'raises an error at touch in if insufficent balance' do
+      expect{subject.touch_in(entry_station)}.to raise_error "Insufficent balance"
     end
   end
 
   describe '#touch_out' do
 
-    it 'when journey is complete deducts fare from balance' do
+    it 'when journey is complete deducts fare from balance' do #the cost of fare from Journey
       subject.top_up(10)
       subject.touch_in(entry_station)
       subject.touch_out(exit_station)
       expect{subject.touch_out(exit_station)}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
     end
-
-    it 'sets entry station to nil with touch out' do
-      subject.top_up(10)
-      subject.touch_out("Bank")
-      expect(subject.touch_out(entry_station)).to eq nil
-    end
-
-    it 'remembers exit station after touch out' do
-      subject.top_up(10)
-      subject.touch_in(entry_station)
-      subject.touch_out(exit_station)
-      expect(subject.exit_station).to eq exit_station
-    end
   end
-
-   describe "#journey_log" do
-     let(:journey) { {entry_station: "Bank", exit_station: "Aldgate" }  }
-     it "stores a journey" do
-       subject.top_up(10)
-       subject.touch_in("Bank")
-       subject.touch_out("Aldgate")
-       expect(subject.journey_log). to include journey
-     end
-   end
-
 end

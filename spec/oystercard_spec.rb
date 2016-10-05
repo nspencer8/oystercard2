@@ -5,6 +5,10 @@ describe Oystercard do
   let(:entry_station) {double :entry_station == "Aldgate"}
   let(:exit_station) {double (:exit_station == "Bank")}
 
+  it "has an empty list of journeys by default" do
+    expect(subject.journey_log).to be_empty
+  end
+
   it { is_expected.to respond_to :balance }
 
   it 'takes a new card and checks it has a balance' do
@@ -64,17 +68,12 @@ describe Oystercard do
   end
 
    describe "#journey_log" do
-     it "stores the entry station as a journey" do
+     let(:journey) { {entry_station: "Bank", exit_station: "Aldgate" }  }
+     it "stores a journey" do
        subject.top_up(10)
-       subject.touch_in("Aldgate")
-       expect(subject.journey_log[:entry_station]).to eq "Aldgate"
-     end
-
-     it "stores the exit station as a journey" do
-       subject.top_up(10)
-       subject.touch_in(entry_station)
-       subject.touch_out("Bank")
-       expect(subject.journey_log[:exit_station]).to eq "Bank"
+       subject.touch_in("Bank")
+       subject.touch_out("Aldgate")
+       expect(subject.journey_log). to include journey
      end
    end
 

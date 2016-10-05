@@ -2,8 +2,8 @@ require 'oystercard'
 
 describe Oystercard do
 
-  let(:entry_station) {double :entry_station}
-  let(:exit_station) {double :exit_station}
+  let(:entry_station) {double :entry_station == "Aldgate"}
+  let(:exit_station) {double (:exit_station == "Bank")}
 
   it { is_expected.to respond_to :balance }
 
@@ -51,7 +51,7 @@ describe Oystercard do
 
     it 'sets entry station to nil with touch out' do
       subject.top_up(10)
-      subject.touch_out(exit_station)
+      subject.touch_out("Bank")
       expect(subject.touch_out(entry_station)).to eq nil
     end
 
@@ -62,4 +62,20 @@ describe Oystercard do
       expect(subject.exit_station).to eq exit_station
     end
   end
+
+   describe "#journey_log" do
+     it "stores the entry station as a journey" do
+       subject.top_up(10)
+       subject.touch_in("Aldgate")
+       expect(subject.journey_log[:entry_station]).to eq "Aldgate"
+     end
+
+     it "stores the exit station as a journey" do
+       subject.top_up(10)
+       subject.touch_in(entry_station)
+       subject.touch_out("Bank")
+       expect(subject.journey_log[:exit_station]).to eq "Bank"
+     end
+   end
+
 end

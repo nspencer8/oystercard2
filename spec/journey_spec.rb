@@ -1,6 +1,3 @@
-
-# returning whether or not the journey is complete
-
 require "journey"
 
 describe Journey do
@@ -30,10 +27,23 @@ describe Journey do
     expect(subject.fare).to eq Journey::PENALTY_FARE
   end
 
-  it 'returns if a journey is complete' do
+  context '#complete_journey' do
+  it 'returns true if a journey is complete' do
     subject.entry_station = station_entry
     subject.exit_station = station_exit
     expect(subject.complete_journey?).to be true
   end
+
+  it 'returns false if a journey has no exit station' do
+    subject.entry_station = station_entry
+    expect(subject.complete_journey?).to be false
+  end
+
+  it 'returns false if a journey has no entry station' do
+    subject.exit_station = station_exit
+    expect(subject.complete_journey?).to be false
+  end
+end
+
 
 end

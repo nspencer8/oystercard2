@@ -5,7 +5,7 @@ describe Oystercard do
 
   let(:entry_station) {double :entry_station}
   let(:exit_station) {double :exit_station}
-
+  let(:journey) {double :journey, fare: 1}
   it { is_expected.to respond_to :balance }
 
   it 'takes a new card and checks it has a balance' do
@@ -19,7 +19,7 @@ describe Oystercard do
       expect{subject.top_up 1}.to change{ subject.balance }.by 1
     end
     it 'raises an error if the balance amount exceeds £90' do
-      limit = Oystercard::LIMIT
+      limit = Oystercard::MAX_BALANCE
       subject.top_up(90)
       message = "Balance cannot exceed #{limit}, cannot top up"
       expect{subject.top_up 1 }.to raise_error message
@@ -43,11 +43,25 @@ describe Oystercard do
       subject.touch_in(entry_station)
     end
     it 'when journey is complete deducts fare from balance' do
-      expect{subject.touch_out(exit_station)}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
+      expect{subject.touch_out(exit_station)}.to change{subject.balance}.by(-1)
     end
-    it 'resets current journey to nil' do
+    it 'resets current journey' do
       subject.touch_out(exit_station)
-      expect(subject.current_journey).to eq nil
+      expect(subject.current_journey.in_journey?).to eq false
+    end
+  end
+
+  describe "forgetting to touch in or out" do
+    it "stores the incomplete journey when forgotten to touch in" do
+      subject.top_up(10)
+      subject.touch_out(exit_station)
+      expect(subject.journey_log.last.entry_station).to be nil
+    end
+
+    it "stores the incomplete journey when forgotten to touch out" do
+      subject.top_up(10)
+      subject.touch_in(entry_station)
+      expect(subject.journey_log.last.exit_station).to be nil
     end
   end
 
@@ -62,5 +76,7 @@ describe Oystercard do
       expect(subject.journey_log.last).to be_a Journey
     end
   end
+
+
 
 end

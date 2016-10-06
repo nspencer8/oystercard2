@@ -12,8 +12,12 @@ class Journey
   end
 
   def fare
-    return MINIMUM_FARE if entry_station && exit_station
+    return MINIMUM_FARE if complete_journey?
     PENALTY_FARE
+  end
+
+  def complete_journey?
+    !!entry_station && !!exit_station
   end
 
 end

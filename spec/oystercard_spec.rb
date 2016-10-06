@@ -33,8 +33,8 @@ describe Oystercard do
 
     it 'starts a journey' do
       subject.top_up(10)
-      subject.touch_in
-      expect(subject.journey).to eq entry_station
+      subject.touch_in(entry_station)
+      expect(subject.current_journey.entry_station).to eq entry_station
     end
 
     it 'raises an error at touch in if insufficent balance' do
@@ -50,5 +50,22 @@ describe Oystercard do
       subject.touch_out(exit_station)
       expect{subject.touch_out(exit_station)}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
     end
+  end
+
+  it "has an empty list of journeys by default" do
+    expect(subject.journey_log).to be_empty
+  end
+
+  describe "#journey_log" do
+    let(:journey) { {entry_station: "Bank", exit_station: "Aldgate" }  }
+    it "stores a journey" do
+      subject.touch_in("Bank")
+      subject.touch_out("Aldgate")
+      expect(subject.journey_log). to include journey
+    end
+  end
+  xit 'sets entry station to nil with touch out' do
+    subject.touch_out("Bank")
+    expect(subject.touch_out(entry_station(station_entry))).to eq nil
   end
 end

@@ -3,9 +3,8 @@ require 'journey'
 
 describe Oystercard do
 
-  let(:entry_station) {double :entry_station == "Aldgate"}
-  let(:exit_station) {double (:exit_station == "Bank")}
-
+  let(:entry_station) {double :entry_station}
+  let(:exit_station) {double :exit_station}
 
   it { is_expected.to respond_to :balance }
 
@@ -14,13 +13,11 @@ describe Oystercard do
   end
 
   describe '#top_up' do
-
     it { is_expected.to respond_to(:top_up).with(1).argument }
 
     it 'is able to top up balance' do
       expect{subject.top_up 1}.to change{ subject.balance }.by 1
     end
-
     it 'raises an error if the balance amount exceeds £90' do
       limit = Oystercard::LIMIT
       subject.top_up(90)
@@ -30,42 +27,40 @@ describe Oystercard do
   end
 
   describe '#touch_in' do
-
     it 'starts a journey' do
       subject.top_up(10)
       subject.touch_in(entry_station)
       expect(subject.current_journey.entry_station).to eq entry_station
     end
-
     it 'raises an error at touch in if insufficent balance' do
       expect{subject.touch_in(entry_station)}.to raise_error "Insufficent balance"
     end
   end
 
   describe '#touch_out' do
-
-    it 'when journey is complete deducts fare from balance' do #the cost of fare from Journey
+    before do
       subject.top_up(10)
       subject.touch_in(entry_station)
-      subject.touch_out(exit_station)
+    end
+    it 'when journey is complete deducts fare from balance' do
       expect{subject.touch_out(exit_station)}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
     end
-  end
-
-  it "has an empty list of journeys by default" do
-    expect(subject.journey_log).to be_empty
+    it 'resets current journey to nil' do
+      subject.touch_out(exit_station)
+      expect(subject.current_journey).to eq nil
+    end
   end
 
   describe "#journey_log" do
-    let(:journey) { {entry_station: "Bank", exit_station: "Aldgate" }  }
+    it "has an empty list of journeys by default" do
+      expect(subject.journey_log).to be_empty
+    end
     it "stores a journey" do
-      subject.touch_in("Bank")
-      subject.touch_out("Aldgate")
-      expect(subject.journey_log). to include journey
+      subject.top_up(10)
+      subject.touch_in(entry_station)
+      subject.touch_out(exit_station)
+      expect(subject.journey_log.last).to be_a Journey
     end
   end
-  xit 'sets entry station to nil with touch out' do
-    subject.touch_out("Bank")
-    expect(subject.touch_out(entry_station(station_entry))).to eq nil
-  end
+
 end

@@ -1,4 +1,4 @@
-# calculating the fare of a journey
+
 # returning whether or not the journey is complete
 
 require "journey"
@@ -17,4 +17,17 @@ describe Journey do
     subject.exit_station = station_exit
     expect(subject.exit_station).to eq station_exit
   end
+
+  it 'returns the minimun fare' do
+    subject.entry_station = station_entry
+    subject.exit_station = station_exit
+    expect(subject.fare).to eq Journey::MINIMUM_FARE
+  end
+
+  it 'returns the penalty fare' do
+    subject.entry_station = station_entry
+    subject.exit_station = nil
+    expect(subject.fare).to eq Journey::PENALTY_FARE
+  end
+
 end

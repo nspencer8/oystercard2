@@ -3,14 +3,14 @@ require_relative "journey"
 
 class Oystercard
 
-  attr_reader :balance, :entry_station, :exit_station, :journey_log, :current_journey
+  attr_reader :balance, :entry_station, :exit_station, :current_journey
 
   MAX_BALANCE = 90
   MINIMUM_BALANCE = 1
 
   def initialize
     @balance = 0
-    @journey_log = []
+    @journey_log = []                               # needs to be removed
     @current_journey = Journey.new
   end
 
@@ -30,9 +30,6 @@ class Oystercard
     finish_journey
   end
 
-  def store_journey
-    journey_log << current_journey
-  end
 
   private
   def deduct(fare)
@@ -41,7 +38,7 @@ class Oystercard
 
   def finish_journey
     deduct(current_journey.fare)
-    store_journey
+    store_journey                        #change to new journey_log class
     @current_journey = Journey.new
   end
 end

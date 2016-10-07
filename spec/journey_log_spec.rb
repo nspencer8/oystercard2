@@ -7,8 +7,8 @@ def initialize
 end
 describe JourneyLog do
 
-  let(:entry_station) {double :entry_station}
-  let(:exit_station) {double :exit_station}
+  let(:complete_journey) {double :complete_journey}
+  let(:current_journey) {double :current_journey}
 
 describe "#journey_log" do
   it "has an empty list of journeys by default" do
@@ -16,10 +16,7 @@ describe "#journey_log" do
   end
 
   it "stores a journey" do
-    subject.top_up
-    subject.touch_in
-    subject.touch_out
-    expect(subject.journey_log.last).to be_a Journey
+    expect(subject.complete_journey).not_to eq current_journey
   end
   end
 end

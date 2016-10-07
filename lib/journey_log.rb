@@ -3,10 +3,12 @@ require_relative "oystercard"
 
 class JourneyLog
 
-attr_reader :journey_log, :top_up, :touch_in, :touch_out
+attr_accessor :journey_log, :complete_journey, :current_journey
+
 
 def initialize
   @journey_log = []
+  @current_journey = Journey.new
 end
 
 def store_journey

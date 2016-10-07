@@ -1,54 +1,47 @@
 require 'oystercard'
 require 'journey'
 
-describe Oystercard do
+class Oystercard
 
-  let(:entry_station) {double :entry_station}
-  let(:exit_station) {double :exit_station}
+  attr_reader :balance, :entry_station, :exit_station, :journey_log, :current_journey
 
-  it { is_expected.to respond_to :balance }
+  MAX_BALANCE = 90
+  MINIMUM_BALANCE = 1
 
-  it 'takes a new card and checks it has a balance' do
-    expect(subject.balance).to eq 0
+  def initialize
+    @balance = 0
+    @journey_log = []
+    @current_journey = Journey.new
   end
 
-  describe '#top_up' do
-    it { is_expected.to respond_to(:top_up).with(1).argument }
-
-    it 'is able to top up balance' do
-      expect{subject.top_up 1}.to change{ subject.balance }.by 1
-    end
-    it 'raises an error if the balance amount exceeds £90' do
-      limit = Oystercard::LIMIT
-      subject.top_up(90)
-      message = "Balance cannot exceed #{limit}, cannot top up"
-      expect{subject.top_up 1 }.to raise_error message
-    end
+  def top_up(amount)
+    fail "Balance cannot exceed #{MAX_BALANCE}, cannot top up" if balance + amount > MAX_BALANCE
+    @balance += amount
   end
 
-  describe '#touch_in' do
-    it 'starts a journey' do
-      subject.top_up(10)
-      subject.touch_in(entry_station)
-      expect(subject.current_journey.entry_station).to eq entry_station
-    end
-    it 'raises an error at touch in if insufficent balance' do
-      expect{subject.touch_in(entry_station)}.to raise_error "Insufficent balance"
-    end
+  def touch_in(entry_station)
+    finish_journey if !current_journey.in_journey?
+    fail "Insufficent balance" if balance < MINIMUM_BALANCE
+    current_journey.entry_station = entry_station
   end
 
-  describe '#touch_out' do
-    before do
-      subject.top_up(10)
-      subject.touch_in(entry_station)
-    end
-    it 'when journey is complete deducts fare from balance' do
-      expect{subject.touch_out(exit_station)}.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
-    end
-    it 'resets current journey to nil' do
-      subject.touch_out(exit_station)
-      expect(subject.current_journey).to eq nil
-    end
+  def touch_out(exit_station)
+    current_journey.exit_station = exit_station
+    finish_journey
   end
 
+  def store_journey
+    journey_log << current_journey
+  end
+
+  private
+  def deduct(fare)
+    @balance -= fare
+  end
+
+  def finish_journey
+    deduct(current_journey.fare)
+    store_journey
+    @current_journey = Journey.new
+  end
 end
